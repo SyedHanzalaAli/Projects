@@ -2,24 +2,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Structure to store user data
 typedef struct {
     char gender[10];
     char goal[20];
 } User;
 
-// Function prototypes
 void displayDietPlan(User *user);
 void displayWorkoutPlan(User *user);
 void calorieTracker();
 void calculateNetCalories();
+void clearCalorieLog();
 
 int main() {
-    User *user = (User *)malloc(sizeof(User)); // Dynamic memory allocation for user
-
+    User *user = (User *)malloc(sizeof(User));
     printf("Enter your gender (Male/Female): ");
     scanf("%s", user->gender);
-
     printf("Enter your goal (fatloss/muscle gain/both): ");
     scanf(" %[^\n]", user->goal);
 
@@ -30,7 +27,8 @@ int main() {
         printf("2) Gym Workout\n");
         printf("3) Calorie Tracker\n");
         printf("4) Net Calories\n");
-        printf("5) Exit\n");
+        printf("5) Clear Calorie Log\n");
+        printf("6) Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
@@ -48,18 +46,20 @@ int main() {
                 calculateNetCalories();
                 break;
             case 5:
+                clearCalorieLog();
+                break;
+            case 6:
                 printf("Exiting the program. Stay healthy!\n");
                 break;
             default:
                 printf("Invalid choice! Please try again.\n");
         }
-    } while (choice != 5);
+    } while (choice != 6);
 
-    free(user); // Freeing allocated memory
+    free(user);
     return 0;
 }
 
-// Function to display diet plan
 void displayDietPlan(User *user) {
     char filename[50];
     sprintf(filename, "diet_%s%s.txt", user->goal, user->gender);
@@ -78,7 +78,6 @@ void displayDietPlan(User *user) {
     fclose(file);
 }
 
-// Function to display workout plan
 void displayWorkoutPlan(User *user) {
     char filename[50];
     sprintf(filename, "workout_%s%s.txt", user->goal, user->gender);
@@ -97,13 +96,10 @@ void displayWorkoutPlan(User *user) {
     fclose(file);
 }
 
-// Function for calorie tracker
 void calorieTracker() {
     int caloriesConsumed, caloriesBurned;
-
     printf("\nEnter total calories consumed today: ");
     scanf("%d", &caloriesConsumed);
-
     printf("Enter total calories burned today: ");
     scanf("%d", &caloriesBurned);
 
@@ -115,11 +111,9 @@ void calorieTracker() {
 
     fprintf(file, "%d %d\n", caloriesConsumed, caloriesBurned);
     fclose(file);
-
     printf("Calorie data saved successfully!\n");
 }
 
-// Function to calculate net calories
 void calculateNetCalories() {
     FILE *file = fopen("calorie_log.txt", "r");
     if (file == NULL) {
@@ -129,7 +123,6 @@ void calculateNetCalories() {
 
     int totalConsumed = 0, totalBurned = 0;
     int consumed, burned;
-
     while (fscanf(file, "%d %d", &consumed, &burned) != EOF) {
         totalConsumed += consumed;
         totalBurned += burned;
@@ -137,9 +130,18 @@ void calculateNetCalories() {
     fclose(file);
 
     int netCalories = totalConsumed - totalBurned;
-
     printf("\nNet Calorie Summary:\n");
     printf("Total Calories Consumed: %d\n", totalConsumed);
     printf("Total Calories Burned: %d\n", totalBurned);
     printf("Net Calories: %d\n", netCalories);
+}
+
+void clearCalorieLog() {
+    FILE *file = fopen("calorie_log.txt", "w");
+    if (file == NULL) {
+        printf("Error: Unable to clear calorie log file.\n");
+        return;
+    }
+    fclose(file);
+    printf("Calorie log file cleared successfully!\n");
 }
